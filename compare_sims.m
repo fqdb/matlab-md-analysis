@@ -2,7 +2,9 @@ function compare_sims(folder)
 % Compare the results (per property) from several different foldes and temperatures
 % Combine upfolder, subs and temps to loop over all folders
 % The results are saved in 'compare_file', from which the plots are made
- 
+    
+    close all
+
     % Read all subfolders in 'folder':
     % Add '\' if not present
     if folder(end)~= '\'
@@ -75,10 +77,6 @@ function plot_comparison(sims_comp)
                 end
             end
         plot(temp_x, temp_y, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
-        % plot by line with same properties
-        for
-            sims_compare
-        end
         end       
         legend(names)
         % For checking if the legend is correct:        
@@ -99,11 +97,12 @@ function plot_comparison(sims_comp)
         ax = gca;
         hold on
         ylabel(multi_titles_of_plots{a})
-        temp_x = [1:1:numel(sims_comp.(sims{1}).jump_names)];
         title(sims_comp.(sims{1}).material);
         for i = 1:numel(sims)
+            temp_x = [1:1:numel(sims_comp.(sims{i}).jump_names)];
             temp_y = sims_comp.(sims{i}).(multi_props_to_plot{a})(:,1)';
-            temp_y
+            strcat('temp_x=', num2str(length(temp_x)),' temp_y=', num2str(length(temp_y)))
+            
             plot(temp_x, temp_y, pointstyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
         end       
         %legend(subs.name)
