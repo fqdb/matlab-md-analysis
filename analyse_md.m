@@ -1,4 +1,5 @@
 function analyse_md(folder, diff_elem, material)
+close all;
 % Materials known: 'argyrodite', 'latp', 'LiSnPS', 'na3ps4', 'li3ps4_beta' and 'MnO2_lambda'
 
 % When you use this code in academic work please cite the accompanying paper: 

@@ -17,16 +17,11 @@ function compare_sims(folder)
     subfolder = temps(3:end);
     
     compare_file = [folder, '\sims_compare.mat'];
-    % Load or construct the comparison file:
-    if ~exist(compare_file, 'file')
-        disp('sims_compare.mat not found, reading the data from other files')
-        sims_comp = read_in_sims(folder, subfolder);
-        save(compare_file, 'sims_comp')
-    else
-        disp('sims_compare found')
-        load(compare_file)
-    end
-    
+    % Construct the comparison file:
+    disp('Reading the data')
+    sims_comp = read_in_sims(folder, subfolder);
+    save(compare_file, 'sims_comp')
+  
     %Plot the results in the compare_file:
     plot_comparison(sims_comp) 
 end
@@ -56,7 +51,11 @@ function plot_comparison(sims_comp)
         all_names{i} = strrep(temp{2},'_',' '); % !! Assuming the 'material names' are in temp{2} !!
     end
     % Find the same names to plot those with a line between them:
-    names = unique(all_names);
+    for i = 1:numel(all_names)
+        temp_name = split(all_names{i},'T');
+        names(i) = string(temp_name{1});
+    end
+    names = unique(names);
     %% Plot properties with 1 value per simulation versus Temperature
     for a = 1:numel(props_to_plot)
         figure()
@@ -70,7 +69,8 @@ function plot_comparison(sims_comp)
             temp_x = 0;
             temp_y = 0;
             for j = 1:numel(all_names)
-                if strcmp(names{i}, all_names{j}) %same names
+                temp = split(all_names{j},'T');
+                if strcmp(names(i), temp{1}) %check for same names
                     temp_x(counter) = 1000./sims_comp.(sims{j}).temperature;
                     temp_y(counter) = sims_comp.(sims{j}).(props_to_plot{a});
                     counter = counter + 1;
@@ -100,16 +100,19 @@ function plot_comparison(sims_comp)
         title(sims_comp.(sims{1}).material);
         for i = 1:numel(sims)
             temp_x = [1:1:numel(sims_comp.(sims{i}).jump_names)];
-            temp_y = sims_comp.(sims{i}).(multi_props_to_plot{a})(:,1)';
-            strcat('temp_x=', num2str(length(temp_x)),' temp_y=', num2str(length(temp_y)))
-            
+            temp_y = sims_comp.(sims{i}).(multi_props_to_plot{a})(:,1)';         
             plot(temp_x, temp_y, pointstyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
         end       
         %legend(subs.name)
         ax.XTick = temp_x; 
         % !! Assuming the same jump names in all simulations being compared !!
         ax.XTickLabels = strrep(sims_comp.(sims{1}).jump_names,'_',' ');
-        ax.XTickLabelRotation = 90;   
+        ax.XTickLabelRotation = 90;
+        for i = 1:numel(all_names)
+            temp{i} = strrep(all_names{i},'T','');
+            temp{i} = strrep(temp{i},'0700','700');
+        end
+        legend(temp)
         grid('on')
         % Log scale is better in some cases:
         if strcmp(multi_props_to_plot{a}, 'rates')
@@ -141,7 +144,7 @@ function sims_comp = read_in_sims(upfolder, subs)
             sim_name = split(folder,'\');
             sim_name = append('MD', sim_name{end,1});
             % Replace invalid ' ' character
-            sim_name = strrep(sim_name,' ','')
+            sim_name = strrep(sim_name,' ','');
             sims_comp.(sim_name) = info;
         elseif exist(sim_data_file, 'file')
             fprintf('sites.mat NOT found in given folder: %s \n', folder)                   
