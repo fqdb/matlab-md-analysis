@@ -11,12 +11,6 @@ function [names, pos, supercell] = known_materials(material)
        fprintf('Material is: %s \n', material)         
        fprintf('Assuming a %d x %d x %d supercell \n', supercell(1), supercell(2), supercell(3)) 
        [names, pos] = basnf4(supercell);
-    
-    elseif strcmp(material, 'baxsnxf3')
-       supercell = [2 2 1]; 
-       fprintf('Material is: %s \n', material)         
-       fprintf('Assuming a %d x %d x %d supercell \n', supercell(1), supercell(2), supercell(3)) 
-       [names, pos] = basnf4(supercell);   
        
     elseif strcmp(material, 'bif3')
        supercell = [2 2 1];
@@ -130,33 +124,6 @@ sym = [0 0 0];
   % Construct all:  
    [names, pos] = construct(sym', pos_sym', names_sym, supercell);
 end
-
-%% BaxSnxF3
-% function [names,pos] = baxsnxf3(supercell)
-% % Spacegroup 227, Fd-3m, origin choice 2s
-%     disp('ORIGIN CHOICE 2')
-% %The symmetries applicable to each site:
-% sym = [0 0 0];
-%     % 4f F-site
-%     z = 0.2167
-%     pos_4f = [3/4,1/4,z; 1/4,3/4,z;	1/4,3/4,-z;	3/4,1/4,-z];
-%     names_4f = {'4f', '4f', '4f', '4f'}; 
-%     % 2c F-site
-%     z = 0.3136
-%     pos_2c = [1/4,1/4,z; 3/4,3/4,-z];
-%     names_2c = {'2c', '2c'}; 
-%     % 2b F-site
-%     z = 0.5
-%     pos_2b = [3/4,1/4,1/2; 1/4,3/4,1/2];
-%     names_2b = {'2b', '2b'}; 
-%    
-%   %All the positions in this material             
-%     pos_sym = [pos_4f(:,:); pos_2c(:,:); pos_2b(:,:)];
-%     names_sym = {names_4f{:}, names_2c{:}, names_2b{:}};   
-%   % Construct all:  
-%    [names, pos] = construct(sym', pos_sym', names_sym, supercell);
-% end
-
 
 %% LAGP
 function [names, pos] = lagp(supercell)

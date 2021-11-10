@@ -109,7 +109,7 @@ close all;
         % Displacement per element, for diffusing element per atom, histogram, and density plot:
         plots_from_displacement(sim_data, sites, density_resolution); 
         % Jump sites:  
-        plot_sites(sites, sim_data.lattice, true); %true is to show names of sites instead of numbers
+        plot_sites(sites, sim_data, true); %true is to show names of sites instead of numbers
         % Nr. of jumps vs. jump distance:
         jumps_vs_dist(sites, sim_data, true, jump_res);
         % Attempt frequency and vibration amplitude:

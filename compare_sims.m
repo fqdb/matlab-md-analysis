@@ -45,15 +45,19 @@ function plot_comparison(sims_comp)
    
     linestyles = {'-o', '-^', '-*', '-p', '-+', '-d', '-v', '-<', '->'};
     pointstyles = {'+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+'};
+%     Gather sim names and clean them up for plotting
+%   Recommended format: e.g. /BiF3/MD700K/simulation_data.mat
     sims = fieldnames(sims_comp);
     for i = 1:numel(sims) 
         temp = strsplit(sims{i}, 'MD');
         all_names{i} = strrep(temp{2},'_',' '); % !! Assuming the 'material names' are in temp{2} !!
+        all_names2{i} = strrep(sims{i},'MD','');
     end
     % Find the same names to plot those with a line between them:
     for i = 1:numel(all_names)
         temp_name = split(all_names{i},'T');
         names(i) = string(temp_name{1});
+%         temp = cellfun('isempty',i);
     end
     names = unique(names);
     %% Plot properties with 1 value per simulation versus Temperature
@@ -109,8 +113,9 @@ function plot_comparison(sims_comp)
         ax.XTickLabels = strrep(sims_comp.(sims{1}).jump_names,'_',' ');
         ax.XTickLabelRotation = 90;
         for i = 1:numel(all_names)
-            temp{i} = strrep(all_names{i},'T','');
+            temp{i} = strrep(all_names2{i},'T','');
             temp{i} = strrep(temp{i},'0700','700');
+            temp{i} = strrep(temp{i},'_',' ');
         end
         legend(temp)
         grid('on')
@@ -144,7 +149,7 @@ function sims_comp = read_in_sims(upfolder, subs)
             sim_name = split(folder,'\');
             sim_name = append('MD', sim_name{end,1});
             % Replace invalid ' ' character
-            sim_name = strrep(sim_name,' ','');
+            sim_name = strrep(sim_name,' ','_');
             sims_comp.(sim_name) = info;
         elseif exist(sim_data_file, 'file')
             fprintf('sites.mat NOT found in given folder: %s \n', folder)                   
