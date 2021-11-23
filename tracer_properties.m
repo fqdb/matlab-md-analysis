@@ -1,4 +1,4 @@
-function [tracer_diff, tracer_conduc, particle_density, mol_per_liter] = ... 
+function [tracer_diff, tracer_diff_error, tracer_conduc, tracer_conduc_error, particle_density, mol_per_liter] = ... 
     tracer_properties(sim_data)
 % Calculate the diffusion and conductivity based on the displacement
 % For calculating the diffusion:
@@ -17,8 +17,7 @@ function [tracer_diff, tracer_conduc, particle_density, mol_per_liter] = ...
     
     % Mean Squared Displacement:        
     displacement = sim_data.displacement(sim_data.start_diff_elem:sim_data.end_diff_elem, sim_data.nr_steps);
-    sqrd_disp = displacement.^2;
-    msd = mean(sqrd_disp); % In Angstrom^2
+    msd = mean(displacement.^2); % In Angstrom^2
 
     % Diffusivity = MSD/(2*dimensions*time)
     tracer_diff = (msd * ang2m^2)/(2*dimensions*sim_data.total_time); % In m^2/sec
@@ -30,4 +29,20 @@ function [tracer_diff, tracer_conduc, particle_density, mol_per_liter] = ...
     fprintf('Tracer diffusivity determined to be (in meter^2/sec): %d \n', tracer_diff)
     fprintf('Tracer conductivity determined to be (in Siemens/meter): %d \n', tracer_conduc)
     disp('-------------------------------------------')
+    
+    % Calculate standard deviation for 10 parts
+    length_data = length(sim_data.displacement);
+    for i = 1:10
+        index = round(linspace(1,length_data,11));
+        disp_part = sim_data.displacement(:,index(i):index(i+1));
+        % Set 0 displacement from start of each part
+        disp_part = disp_part - disp_part(:,1);
+        std(sim_data.displacement,0,2)
+        msd = mean(mean(disp_part.^2));
+        tracer_diff_part(i) = (msd * ang2m^2)/(2*dimensions*sim_data.total_time);
+        tracer_conduc_part(i) = ((sim_data.e_charge^2) * (z_ion^2) * tracer_diff * particle_density)/ ...
+        (sim_data.k_boltzmann*sim_data.temperature);
+    end
+    tracer_diff_error = std(tracer_diff_part);
+    tracer_conduc_error = std(tracer_conduc_part);
 end

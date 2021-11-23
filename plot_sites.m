@@ -26,28 +26,29 @@ lat = sim_data.lattice;
 %% Plot the sites (and site-names if show_names == True)
 delta = 0.2; % Small displacement for better text visibility for the names
 temp = size(sim_data.cart_pos);
+temp = size(sites.cart_pos);
 % Override occupancy site dependence
 point_size = max(15*max(log(sites.occupancy(i))),50);
 for i = 1:temp(2)
-    if point_size > 1
-        scatter3(sim_data.cart_pos(1,i), sim_data.cart_pos(2,i), sim_data.cart_pos(3,i), ...
-        point_size, 'blue', 'filled');
-        if show_names
-            text(sim_data.cart_pos(1,i)+delta, sim_data.cart_pos(2,i)+delta, ...
-                sim_data.cart_pos(3,i)+delta, sites.site_names(i) );         
-        end
-    end
 %     if point_size > 1
-%         scatter3(sites.cart_pos(1,i), sites.cart_pos(2,i), sites.cart_pos(3,i), ...
+%         scatter3(sim_data.cart_pos(1,i), sim_data.cart_pos(2,i), sim_data.cart_pos(3,i), ...
 %         point_size, 'blue', 'filled');
 %         if show_names
-%             text(sites.cart_pos(1,i)+delta, sites.cart_pos(2,i)+delta, ...
-%                 sites.cart_pos(3,i)+delta, sites.site_names(i) );         
-%         %else %show site_numbers
-%         %    text(sites.cart_pos(1,i)+delta, sites.cart_pos(2,i)+delta, ...
-%         %        sites.cart_pos(3,i)+delta, num2str(i) );  
+%             text(sim_data.cart_pos(1,i)+delta, sim_data.cart_pos(2,i)+delta, ...
+%                 sim_data.cart_pos(3,i)+delta, sites.site_names(i) );         
 %         end
 %     end
+    if point_size > 1
+        scatter3(sites.cart_pos(1,i), sites.cart_pos(2,i), sites.cart_pos(3,i), ...
+        point_size, 'blue', 'filled');
+        if show_names
+            text(sites.cart_pos(1,i)+delta, sites.cart_pos(2,i)+delta, ...
+                sites.cart_pos(3,i)+delta, sites.site_names(i) );         
+        %else %show site_numbers
+        %    text(sites.cart_pos(1,i)+delta, sites.cart_pos(2,i)+delta, ...
+        %        sites.cart_pos(3,i)+delta, num2str(i) );  
+        end
+    end
 end
 
 % Plot the jumps as lines between the sites, and linewidth depending on the

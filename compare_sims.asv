@@ -72,7 +72,6 @@ function plot_comparison(sims_comp)
             counter = 1;
             temp_x = 0;
             temp_y = 0;
-            temp_z = 0;
             for j = 1:numel(all_names)
                 temp = split(all_names{j},'T');
                 if strcmp(names(i), temp{1}) %check for same names
@@ -87,11 +86,14 @@ function plot_comparison(sims_comp)
                     counter = counter + 1;
                 end
             end
-            if strcmp(props_to_plot{a},'tracer_diffusion') || strcmp(props_to_plot{a},'tracer_conductivity')               
-                errorbar(temp_x, temp_y, temp_z, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
-            else
-                plot(temp_x, temp_y, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
-            end
+        if strcmp(props_to_plot{a},'tracer_diffusion') || strcmp(props_to_plot{a},'tracer_conductivity')
+            display(length(temp_z))
+            display(1000./temp_x)
+            display(titles_of_plots{a})
+            errorbar(temp_x, temp_y, temp_z, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
+        else
+            plot(temp_x, temp_y, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
+        end
         end       
         legend(names)
         % For checking if the legend is correct:        
