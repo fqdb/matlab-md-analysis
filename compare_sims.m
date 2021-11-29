@@ -92,6 +92,10 @@ function plot_comparison(sims_comp)
             else
                 plot(temp_x, temp_y, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
             end
+            if strcmp(props_to_plot{a},'frac_collective')
+                display(temp_x)
+                display(temp_y)
+            end
         end       
         legend(names)
         % For checking if the legend is correct:        
@@ -132,7 +136,7 @@ function plot_comparison(sims_comp)
         grid('on')
         % Log scale is better in some cases:
         if strcmp(multi_props_to_plot{a}, 'rates')
-            set(gca, 'YScale', 'log')
+%             set(gca, 'YScale', 'log')
         end
         hold off
     end

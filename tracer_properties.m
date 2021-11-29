@@ -37,10 +37,9 @@ function [tracer_diff, tracer_diff_error, tracer_conduc, tracer_conduc_error, pa
         disp_part = sim_data.displacement(:,index(i):index(i+1));
         % Set 0 displacement from start of each part
         disp_part = disp_part - disp_part(:,1);
-        std(sim_data.displacement,0,2)
         msd = mean(mean(disp_part.^2));
-        tracer_diff_part(i) = (msd * ang2m^2)/(2*dimensions*sim_data.total_time);
-        tracer_conduc_part(i) = ((sim_data.e_charge^2) * (z_ion^2) * tracer_diff * particle_density)/ ...
+        tracer_diff_part(i) = (msd * ang2m^2)/(2*dimensions*sim_data.total_time*(1/10));
+        tracer_conduc_part(i) = ((sim_data.e_charge^2) * (z_ion^2) * tracer_diff_part(i) * particle_density)/ ...
         (sim_data.k_boltzmann*sim_data.temperature);
     end
     tracer_diff_error = std(tracer_diff_part);
