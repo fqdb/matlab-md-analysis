@@ -38,7 +38,9 @@ function plot_comparison(sims_comp)
        'Tracer diffusivity (m^2/sec)', 'Tracer conductivity (S/m)',...   
        'Known site occupation (%)', 'Collective jumps (%)', ...
        'Jump diffusivity (m^2/sec)', 'Correlation factor'};
-
+    ylabels_of_plots = titles_of_plots;
+    ylabels_of_plots{3} = 'log(Tracer diffusivity) (m^2/sec)';
+    ylabels_of_plots{4} = 'log(Tracer conductivity) (S/m)';
    % Properties with a value per type of jump: 
     multi_props_to_plot  = {'e_act', 'rates'};
     multi_titles_of_plots = {'Activation energy (eV)', 'Jump rate (Hz)'};
@@ -66,7 +68,7 @@ function plot_comparison(sims_comp)
         hold on
         % Labels:
         xlabel('1/Temperature (1000/K)')
-        ylabel(titles_of_plots{a})
+        ylabel(ylabels_of_plots{a})
         title(append(strrep(sims_comp.(sims{1}).material,'_',' '),': ',titles_of_plots{a}))
         for i = 1:numel(names)
             counter = 1;
@@ -88,21 +90,16 @@ function plot_comparison(sims_comp)
                 end
             end
             if strcmp(props_to_plot{a},'tracer_diffusion') || strcmp(props_to_plot{a},'tracer_conductivity')               
-                errorbar(temp_x, temp_y, temp_z, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
+                errorbar(temp_x, log(temp_y), log(temp_z), linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
             else
                 plot(temp_x, temp_y, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
-            end
-            if strcmp(props_to_plot{a},'frac_collective')
-                display(temp_x)
-                display(temp_y)
             end
         end       
         legend(names)
         % For checking if the legend is correct:        
         %names 
         % Log-scale is better in some cases:
-        if strcmp(props_to_plot{a},'tracer_diffusion') || strcmp(props_to_plot{a}, 'tracer_conductivity') ...
-            || strcmp(props_to_plot{a}, 'jump_diffusion')    
+        if strcmp(props_to_plot{a}, 'jump_diffusion')    
             set(gca, 'YScale', 'log')
         end
         grid on
