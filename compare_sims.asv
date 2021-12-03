@@ -130,6 +130,7 @@ function plot_comparison(sims_comp,folder)
     end
     hold off
     % Save figure as PDF
+    display(folder)
     foldername = split(folder,'\');
     save_as_pdf(foldername{end-1});
     figure
@@ -137,7 +138,7 @@ function plot_comparison(sims_comp,folder)
     bar(categorical(names),E_A,'FaceColor','#00A6D6');
     title('Activation energy');
     ylabel('Activation energy (kJ/mol)');
-    er = errorbar(categorical(names),E_A,fit_error);
+    er = errorbar(categorical(names),fit_error)
     er.Color = [0 0 0];                            
     er.LineStyle = 'none';  
     hold off

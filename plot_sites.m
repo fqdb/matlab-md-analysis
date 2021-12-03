@@ -123,5 +123,4 @@ end
     axis([min_coor(1) max_coor(1) min_coor(2) max_coor(2) min_coor(3) max_coor(3)])
     view(-10, 10)
     hold off
-
 end
