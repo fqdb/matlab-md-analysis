@@ -116,7 +116,7 @@ function plot_comparison(sims_comp,folder)
             set(gca, 'YScale', 'log')
         end
         grid on
-        grid minor
+        box on
         hold off
     end
     % Plot activation energy and save
@@ -128,6 +128,7 @@ function plot_comparison(sims_comp,folder)
         plot(x_values{i},fit{i}(1).*x_values{i} + fit{i}(2),'LineWidth',2)
         legend([strings(1,length(names)),names])
     end
+    box on
     hold off
     % Save figure as PDF
     foldername = split(folder,'\');
@@ -135,7 +136,6 @@ function plot_comparison(sims_comp,folder)
     figure
     hold on
     bar(categorical(names),E_A,'FaceColor','#00A6D6');
-    title('Activation energy');
     ylabel('Activation energy (kJ/mol)');
     er = errorbar(categorical(names),E_A,fit_error);
     er.Color = [0 0 0];                            
@@ -254,6 +254,7 @@ end
 function save_as_pdf(title)
     set(gcf, 'PaperPosition', [0 0 6 4]); %Position plot at left hand corner with width 5 and height 5.
     set(gcf, 'PaperSize', [6 4]); %Set the paper to have width 5 and height 5.
+    box on
     saveas(gcf, strcat(title), 'pdf') %Save figure
     print('Saved as PDF')
 end
