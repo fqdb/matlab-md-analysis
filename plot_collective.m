@@ -15,6 +15,9 @@ function plot_collective(sites)
     colorbar
     title('Number of cooperative jumps per jump-type combination')
     % Put all the jump names on the x- and y-axis
+    for i = 1:length(sites.jump_names)
+        sites.jump_names{i} = strrep(sites.jump_names{i},'_',' ');
+    end
     ax.XTick = 1:1:size(sites.jump_names,1); 
     ax.YTick = 1:1:size(sites.jump_names,1);
     ax.XTickLabels = sites.jump_names;

@@ -44,8 +44,8 @@ function plot_comparison(sims_comp,folder)
        'Known site occupation (%)', 'Collective jumps (%)', ...
        'Jump diffusivity (m^2/sec)', 'Correlation factor'};
     ylabels_of_plots = titles_of_plots;
-    ylabels_of_plots{3} = 'log(Tracer diffusivity) (m^2/sec)';
-    ylabels_of_plots{4} = 'log(Tracer conductivity) (S/m)';
+    ylabels_of_plots{3} = 'ln(Tracer diffusivity) (m^2/sec)';
+    ylabels_of_plots{4} = 'ln(\sigma) (S/cm)';
    % Properties with a value per type of jump: 
     multi_props_to_plot  = {'e_act', 'rates'};
     multi_titles_of_plots = {'Activation energy (eV)', 'Jump rate (Hz)'};
@@ -92,6 +92,7 @@ function plot_comparison(sims_comp,folder)
                         temp_z(counter) = sims_comp.(sims{j}).tracer_diffusion_error;
                     end
                     if strcmp(props_to_plot{a},'tracer_conductivity')
+                        temp_y(counter) = sims_comp.(sims{j}).(props_to_plot{a})/100;
                         temp_z(counter) = sims_comp.(sims{j}).tracer_conductivity_error;
                     end
                     counter = counter + 1;
