@@ -18,6 +18,18 @@ function [names, pos, supercell] = known_materials(material)
        fprintf('Assuming a %d x %d x %d supercell \n', supercell(1), supercell(2), supercell(3)) 
        [names, pos] = bif3(supercell);
        
+    elseif strcmp(material, 'bif3_pnma')
+       supercell = [2 1 1];
+       fprintf('Material is: %s \n', material)         
+       fprintf('Assuming a %d x %d x %d supercell \n', supercell(1), supercell(2), supercell(3)) 
+       [names, pos] = bif3_pnma(supercell);
+    
+    elseif strcmp(material, 'bif3_p63')
+        supercell = [2 2 2];
+        fprintf('Material is: %s \n', material)         
+        fprintf('Assuming a %d x %d x %d supercell \n', supercell(1), supercell(2), supercell(3)) 
+        [names, pos] = bif3_p63(supercell);
+       
     elseif strcmp(material, 'latp')
        supercell = [1 1 1]; 
        fprintf('Material is: %s \n', material)         
@@ -85,15 +97,15 @@ function [names,pos] = basnf4(supercell)
 %The symmetries applicable to each site:
 sym = [0 0 0];
     % 4f F-site
-    z = 0.2167
+    z = 0.2167;
     pos_4f = [3/4,1/4,z; 1/4,3/4,z;	1/4,3/4,-z;	3/4,1/4,-z];
     names_4f = {'4f', '4f', '4f', '4f'}; 
     % 2c F-site
-    z = 0.3136
+    z = 0.3136;
     pos_2c = [1/4,1/4,z; 3/4,3/4,-z];
     names_2c = {'2c', '2c'}; 
     % 2b F-site
-    z = 0.5
+    z = 0.5;
     pos_2b = [3/4,1/4,1/2; 1/4,3/4,1/2];
     names_2b = {'2b', '2b'}; 
    
@@ -105,8 +117,9 @@ sym = [0 0 0];
 end
 
 %% BiF3
+% OLD
 function [names,pos] = bif3(supercell)
-% Spacegroup 62, Pnma , origin choice 2s
+% Spacegroup 62, P63/nmm , origin choice 2s
     disp('ORIGIN CHOICE 2')
 %The symmetries applicable to each site:
 sym = [0 0 0];
@@ -123,6 +136,56 @@ sym = [0 0 0];
     names_sym = {names_4f{:},names_2b{:}};   
   % Construct all:  
    [names, pos] = construct(sym', pos_sym', names_sym, supercell);
+end
+
+function [names, pos] = bif3_pnma(supercell)
+% Space group no. 62 (Pnma)
+sym = [0 0 0];
+    % 8d-sites
+    x = 0.16071799;
+    y = 0.06034500;
+    z = 0.351552;
+    
+    pos_8d_t = [x,y,z; -x+1/2,-y,z+1/2; -x,y+1/2,-z; x+1/2,-y+1/2,-z+1/2; 
+        -x,-y,-z; x+1/2,y,-z+1/2; x,-y+1/2,z; -x+1/2,y+1/2,z+1/2;];
+    pos_8d = [pos_8d_t(:,3), pos_8d_t(:,1), pos_8d_t(:,2)];
+    names_8d = {'8d','8d','8d','8d','8d','8d','8d','8d'};
+    
+    x = 0.04054000;
+    y = 0.25000000;
+    z = 0.86299199;
+    
+    pos_4c_t = [x,1/4,z; -x+1/2,3/4,1/2; -x,3/4,-z; x+1/2,1/4,-z+1/2];
+    pos_4c = [pos_4c_t(:,3), pos_4c_t(:,1), pos_4c_t(:,2)];
+    names_4c = {'4c','4c','4c','4c'};
+   
+    pos_sym = [pos_8d(:,:);pos_4c(:,:)];
+    names_sym = {names_8d{:},names_4c{:}};
+
+    %Construct all sites:
+    [names, pos] = construct(sym', pos_sym', names_sym, supercell);
+end
+
+function [names, pos] = bif3_p63(supercell)
+% Space group no. 173 (P63)
+sym = [0 0 0];
+    % 2a-sites
+    z = 0.25;
+    pos_2a = [0,0,z;0,0,z+0.5];
+    names_2a = {'2a','2a'};
+    
+    % 2b-sites
+    x = 0;
+    y = 0;
+    z = 0.42104;
+    pos_2b = [1/3,2/3,z; 2/3,1/3,z+0.5];
+    names_2b = {'2b', '2b'};
+    
+    pos_sym = [pos_2a(:,:); pos_2b(:,:)];
+    names_sym = {names_2a{:}, names_2b{:} };
+
+    %Construct all sites:
+    [names, pos] = construct(sym', pos_sym', names_sym, supercell);
 end
 
 %% LAGP

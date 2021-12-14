@@ -15,7 +15,15 @@ function compare_sims(folder)
     temps = files(dirs);  
     % remove '.' and '..'
     subfolder = temps(3:end);
-   
+    folders = {subfolder.folder};
+    for i = 1:length(folders)
+        files = dir(folders{i});
+        dirs = [files.isdir];
+        temps = files(dirs);  
+        % remove '.' and '..'
+        subsubfolders = temps(3:end);
+    end
+    
     compare_file = [folder, '/sims_compare.mat'];
     % Load or construct the comparison file:
     if ~exist(compare_file, 'file')
@@ -52,7 +60,7 @@ function plot_comparison(sims_comp,folder)
    
 %     linestyles = {'-o', '-^', '-*', '-p', '-+', '-d', '-v', '-<', '->'};
     linestyles = {'o', '^', '*', 'p', '+', 'd', 'v', '<', '>'};
-    pointstyles = {'+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+'};
+    pointstyles = {'+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+', 'o', '*', '+'};
 %     Gather sim names and clean them up for plotting
 %   Recommended format: e.g. /BiF3/BiF3_T0700K/simulation_data.mat
     sims = fieldnames(sims_comp);
@@ -61,8 +69,8 @@ function plot_comparison(sims_comp,folder)
     for i = 1:numel(all_names)
         temp_name = split(all_names{i},'_T');
         names(i) = string(temp_name{1});
-        names(i) = strrep(names(i),'sim_','');
-        display_names(i) = strrep(names(i),'_',' ');
+        display_names(i) = strrep(names(i),'sim_','');
+        display_names(i) = strrep(display_names(i),'_',' ');
         display_names(i) = strrep(display_names(i),'F3','F_3');
         display_names(i) = strrep(display_names(i),'MD','');
     end
@@ -99,8 +107,7 @@ function plot_comparison(sims_comp,folder)
                 E_A(i) = activation_energy(temp_x,log(temp_y));
                 fit{i} = polyfit(temp_x,log(temp_y),1);
                 model = fitlm(temp_x,log(temp_y));
-%                 fit_error(i) = model.RMSE;
-                fit_error(i) = sum(log(temp_z)./2)*(2/length(temp_z));
+                fit_error(i) = sum(log(temp_z)./2)*(2/length(temp_z));%model.RMSE;
                 x_values{i} = temp_x;
                 errorbar(temp_x, log(temp_y), log(temp_z)./2, linestyles{i}, 'LineWidth', 1.0, 'MarkerSize', 10.0)
             elseif strcmp(props_to_plot{a},'tracer_diffusion')             
@@ -126,10 +133,7 @@ function plot_comparison(sims_comp,folder)
     for i = 1:numel(unique(names))
         plot(x_values{i},fit{i}(1).*x_values{i} + fit{i}(2),'LineWidth',2)
         legend([strings(1,length(display_names)),display_names])
-        sigma_at_RT(i) = exp(fit{i}(1).*(1000/298) + fit{i}(2));
     end
-    sigma_at_RT = {unique(names);sigma_at_RT};
-    writetable(cell2table(sigma_at_RT),'Conductivity_at_RT.csv')
     box on
     hold off
     % Save figure as PDF
@@ -149,7 +153,7 @@ function plot_comparison(sims_comp,folder)
     E_A = {unique(names),E_A};
     E_A_file = [folder, '\activation_energy.mat'];
     save(E_A_file, 'E_A');
-  
+    save_as_pdf(strcat(foldername{end-1},'_activation_energy'));
     %% Properties with a value per type of jump, plot versus jump name 
     for a = 1:numel(multi_props_to_plot)
         clear temp
@@ -160,7 +164,7 @@ function plot_comparison(sims_comp,folder)
 %         title(sims_comp.(sims{1}).material);
         for i = 1:numel(sims)
             temp_x = [1:1:numel(sims_comp.(sims{i}).jump_names)];
-            temp_y = sims_comp.(sims{i}).(multi_props_to_plot{a})(:,1)';   
+            temp_y = sims_comp.(sims{i}).(multi_props_to_plot{a})(:,1)';         
             plot(temp_x, temp_y, pointstyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
         end       
         %legend(subs.name)

@@ -61,8 +61,8 @@ function plot_comparison(sims_comp,folder)
     for i = 1:numel(all_names)
         temp_name = split(all_names{i},'_T');
         names(i) = string(temp_name{1});
-        names(i) = strrep(names(i),'sim_','');
-        display_names(i) = strrep(names(i),'_',' ');
+        display_names(i) = strrep(names(i),'sim_','');
+        display_names(i) = strrep(display_names(i),'_',' ');
         display_names(i) = strrep(display_names(i),'F3','F_3');
         display_names(i) = strrep(display_names(i),'MD','');
     end
@@ -124,12 +124,9 @@ function plot_comparison(sims_comp,folder)
     % Reset colors to plot fitlines in same color
     set(gca,'ColorOrderIndex',1)
     for i = 1:numel(unique(names))
-        plot(x_values{i},fit{i}(1).*x_values{i} + fit{i}(2),'LineWidth',2)
+        plot([x_values{i}, 1000/3],fit{i}(1).*[x_values{i}, 1000/3] + fit{i}(2),'LineWidth',2)
         legend([strings(1,length(display_names)),display_names])
-        sigma_at_RT(i) = exp(fit{i}(1).*(1000/298) + fit{i}(2));
     end
-    sigma_at_RT = {unique(names);sigma_at_RT};
-    writetable(cell2table(sigma_at_RT),'Conductivity_at_RT.csv')
     box on
     hold off
     % Save figure as PDF
@@ -149,7 +146,7 @@ function plot_comparison(sims_comp,folder)
     E_A = {unique(names),E_A};
     E_A_file = [folder, '\activation_energy.mat'];
     save(E_A_file, 'E_A');
-  
+    save_as_pdf(strcat(foldername{end-1},'_activation_energy'));
     %% Properties with a value per type of jump, plot versus jump name 
     for a = 1:numel(multi_props_to_plot)
         clear temp
