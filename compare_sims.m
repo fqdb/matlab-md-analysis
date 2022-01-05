@@ -62,9 +62,7 @@ function plot_comparison(sims_comp,folder)
         temp_name = split(all_names{i},'_T');
         names(i) = string(temp_name{1});
         names(i) = strrep(names(i),'sim_','');
-        display_names(i) = strrep(names(i),'_',' ');
-        display_names(i) = strrep(display_names(i),'F3','F_3');
-        display_names(i) = strrep(display_names(i),'MD','');
+        display_names(i) = format_names(names(i));
     end
     names2 = unique(names);
     display_names = unique(display_names);
@@ -95,12 +93,13 @@ function plot_comparison(sims_comp,folder)
                     counter = counter + 1;
                 end
             end
-            if strcmp(props_to_plot{a},'tracer_conductivity')          
+            if strcmp(props_to_plot{a},'tracer_conductivity')
+                R = 8.31446261815324;
                 E_A(i) = activation_energy(temp_x,log(temp_y));
                 fit{i} = polyfit(temp_x,log(temp_y),1);
                 model = fitlm(temp_x,log(temp_y));
-%                 fit_error(i) = model.RMSE;
-                fit_error(i) = sum(log(temp_z)./2)*(2/length(temp_z));
+                fit_error(i) = model.RMSE/4;
+%                 fit_error(i) = sum(log(temp_z)./2)*(2/length(temp_z));
                 x_values{i} = temp_x;
                 errorbar(temp_x, log(temp_y), log(temp_z)./2, linestyles{i}, 'LineWidth', 1.0, 'MarkerSize', 10.0)
             elseif strcmp(props_to_plot{a},'tracer_diffusion')             
@@ -109,7 +108,7 @@ function plot_comparison(sims_comp,folder)
                 plot(temp_x, temp_y, linestyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
             end
         end       
-        legend(display_names)
+        legend(display_names,'Location','eastoutside')
         % Log-scale is better in some cases:
         if strcmp(props_to_plot{a}, 'jump_diffusion')    
             set(gca, 'YScale', 'log')
@@ -124,6 +123,7 @@ function plot_comparison(sims_comp,folder)
     % Reset colors to plot fitlines in same color
     set(gca,'ColorOrderIndex',1)
     for i = 1:numel(unique(names))
+%         x_values{i} = [x_values{i} 1000/293]; % Optionally fit to RT
         plot(x_values{i},fit{i}(1).*x_values{i} + fit{i}(2),'LineWidth',2)
         legend([strings(1,length(display_names)),display_names])
         sigma_at_RT(i) = exp(fit{i}(1).*(1000/298) + fit{i}(2));
@@ -134,14 +134,15 @@ function plot_comparison(sims_comp,folder)
     hold off
     % Save figure as PDF
     foldername = split(folder,'\');
-    save_as_pdf(foldername{end-1});
+    save_as_pdf(foldername{end-1},800,400);
     figure
     hold on
     clr = get(gca,'colororder');
     clr = clr(1:length(E_A),:);
+    E_A = E_A/96.4869; % Convert to from kJ/mol to eV
     b = bar(categorical(unique(display_names)),E_A,'facecolor', 'flat');
     b.CData = clr;
-    ylabel('Activation energy (kJ/mol)');
+    ylabel('Activation energy (eV)');
     er = errorbar(categorical(unique(display_names)),E_A,fit_error);
     er.Color = [0 0 0];                            
     er.LineStyle = 'none';  
@@ -149,7 +150,7 @@ function plot_comparison(sims_comp,folder)
     E_A = {unique(names),E_A};
     E_A_file = [folder, '\activation_energy.mat'];
     save(E_A_file, 'E_A');
-  
+    save_as_pdf(strcat(foldername{end-1},'_activation_energy'),400,350);
     %% Properties with a value per type of jump, plot versus jump name 
     for a = 1:numel(multi_props_to_plot)
         clear temp
@@ -158,27 +159,33 @@ function plot_comparison(sims_comp,folder)
         hold on
         ylabel(multi_titles_of_plots{a})
 %         title(sims_comp.(sims{1}).material);
+        x2 = {};
         for i = 1:numel(sims)
-            temp_x = [1:1:numel(sims_comp.(sims{i}).jump_names)];
-            temp_y = sims_comp.(sims{i}).(multi_props_to_plot{a})(:,1)';   
-            plot(temp_x, temp_y, pointstyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
+            x = split(all_names{i},'_T');
+            if strcmp(x{end},'1500K')
+                x2{end+1} = all_names{i};
+                temp_x = [1:1:numel(sims_comp.(sims{i}).jump_names)];
+                temp_y = sims_comp.(sims{i}).(multi_props_to_plot{a})(:,1)';
+                temp_y(temp_y == 0) = NaN;
+                plot(temp_x, temp_y, pointstyles{i}, 'LineWidth', 2.0, 'MarkerSize', 10.0)
+            end
         end       
         %legend(subs.name)
         ax.XTick = temp_x; 
         % !! Assuming the same jump names in all simulations being compared !!
         ax.XTickLabels = strrep(sims_comp.(sims{1}).jump_names,'_',' ');
         ax.XTickLabelRotation = 90;
-        for i = 1:numel(all_names)
-            temp{i} = all_names{i};
-            temp{i} = strrep(temp{i},'0700','700');
-            temp{i} = strrep(temp{i},'_',' ');
+        for i = 1:numel(x2)
+            temp{i} = x2{i};
+            temp{i} = format_names(temp{i});
         end
-        legend(temp)
+        legend(temp,'Location','eastoutside')
         grid('on')
         % Log scale is better in some cases:
         if strcmp(multi_props_to_plot{a}, 'rates')
 %             set(gca, 'YScale', 'log')
         end
+        save_as_pdf(strcat(foldername{end-1},'_',multi_props_to_plot{a}),800,350);
         hold off
     end
 end
@@ -257,10 +264,23 @@ function E_A = activation_energy(x,y)
     % kJ/mol
 end
 
-function save_as_pdf(title)
-    set(gcf, 'PaperPosition', [0 0 6 4]); %Position plot at left hand corner with width 5 and height 5.
-    set(gcf, 'PaperSize', [6 4]); %Set the paper to have width 5 and height 5.
+function save_as_pdf(title,w,h)
     box on
-    saveas(gcf, strcat(title), 'pdf') %Save figure
-    print('Saved as PDF')
+    name = sprintf(strcat(title));
+    set(gcf, 'Color', 'w');
+    set(gcf,'position',[0,0,w,h])
+    set(gcf,'Units','Inches');
+    pos = get(gcf,'Position');
+    set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+    saveas(gcf, name, 'pdf') %Save figure
+end
+
+function formatted_name = format_names(name)
+    name = strrep(name,'sim_','');
+    name = strrep(name,'_',' ');
+    name = strrep(name,'0700','700');
+    name = strrep(name,'MD','');
+    name = regexprep(name,'([0-9]+)','_{$1}');
+    name = regexprep(name,'_{([0-9])} vac','{$1} vac');
+    formatted_name = strrep(name,'T_',' ');
 end
